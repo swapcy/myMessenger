@@ -36,7 +36,7 @@ def webhook():
 					else:
 						messaging_text='no text'
 
-					response = 'I m not smart enough to understand : ' + messaging_text + ' :p'
+					response = 'I m not smart enough to understand : ' + messaging_text + '(yet) :X '
 					bot.send_text_message(sender_id,response)
 
 	return "ok",200
