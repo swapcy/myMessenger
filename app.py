@@ -1,6 +1,7 @@
 import os,sys
 from flask import Flask,request
 from pymessenger import Bot
+from random import randint
 
 app = Flask(__name__)
 PAGE_ACCESS_TOKEN = 'EAAEFka4KZCEMBAPsugFglElkiuw2scGO25Y4FXCUOcCLRuzmvX5sTjLhOOtdTHqpLS0s4N1OfltvMGGZCRsRMdoSUNAa13HGaisZCXwNGzNQ2ID8AlXGPlSFCsHsupMyWHqsf9YrZBrSvlRb4FPyrMh0kNXhpBjaQWeaS8B20gZDZD'
@@ -36,7 +37,8 @@ def webhook():
 					else:
 						messaging_text='no text'
 
-					response = 'I m not smart enough to understand : ' + messaging_text + '(yet) :X '
+					emoji = [':)', ':P', ':@', '>:)']					
+					response = 'I m not smart enough to understand : ' + messaging_text + ' (yet) ' + emoji[random()]
 					bot.send_text_message(sender_id,response)
 
 	return "ok",200
@@ -45,6 +47,11 @@ def webhook():
 def log(message):
 	print(message)
 	sys.stdout.flush()
+
+
+def random():
+	return randint(0,3)
+
 
 
 if __name__=="__main__":
