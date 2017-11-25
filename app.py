@@ -23,6 +23,7 @@ def verify():
 def webhook():
 	data = request.get_json()
 	log(data)
+	emoji = [':)', ':P', ';)', ':v', '(y)']					
 
 	if data['object']== 'page':
 		for entry in data['entry']:
@@ -35,10 +36,10 @@ def webhook():
 					if 'text' in messaging_event['message']:
 						messaging_text=messaging_event['message']['text']
 					else:
-						messaging_text='no text'
+						messaging_text= emoji[random(0,5)]
 
-					emoji = [':)', ':P', ':@', '>:)']					
-					response = 'I m not smart enough to understand : ' + messaging_text + ' (yet) ' + emoji[random()]
+					
+					response = getResponse()
 					bot.send_text_message(sender_id,response)
 
 	return "ok",200
@@ -49,8 +50,24 @@ def log(message):
 	sys.stdout.flush()
 
 
-def random():
-	return randint(0,3)
+def random(start,end):
+	return randint(start,end)
+
+def getResponse():
+	magicResponse = ['it is certain', 'it is decidedly so','without a doubt','yes definitely','you may rely on it','as I see it, yes','most likely','outlook good',
+'yes',
+'signs point to yes',
+'reply hazy try again',
+'ask again later',
+'better not tell you now',
+'cannot predict now',
+'concentrate and ask again',
+'don\'t count on it',
+'my reply is no',
+'my sources say no',
+'outlook not so good',
+'very doubtful']
+	return magicResponse[random(0,20)]
 
 
 
