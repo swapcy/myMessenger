@@ -2,6 +2,7 @@ import os,sys
 from flask import Flask,request
 from pymessenger import Bot
 from random import randint
+from twurl import extractTweets as et
 
 app = Flask(__name__)
 PAGE_ACCESS_TOKEN = 'EAAEFka4KZCEMBAPsugFglElkiuw2scGO25Y4FXCUOcCLRuzmvX5sTjLhOOtdTHqpLS0s4N1OfltvMGGZCRsRMdoSUNAa13HGaisZCXwNGzNQ2ID8AlXGPlSFCsHsupMyWHqsf9YrZBrSvlRb4FPyrMh0kNXhpBjaQWeaS8B20gZDZD'
@@ -39,7 +40,7 @@ def webhook():
 						messaging_text= emoji[random(0,5)]
 
 					
-					response = getResponse()
+					response = getResponse(message=messaging_text)
 					bot.send_text_message(sender_id,response)
 
 	return "ok",200
@@ -53,7 +54,7 @@ def log(message):
 def random(start,end):
 	return randint(start,end)
 
-def getResponse():
+def getResponse(message = 'thoughts'):
 	magicResponse = ['it is certain', 'it is decidedly so','without a doubt','yes definitely','you may rely on it','as I see it, yes','most likely','outlook good',
 'yes',
 'signs point to yes',
@@ -67,7 +68,16 @@ def getResponse():
 'my sources say no',
 'outlook not so good',
 'very doubtful']
-	return magicResponse[random(0,20)]
+
+	tweets = extractTweets(message)
+	tweetresp = ''
+	for tweet in tweets:
+		tweetresp =	tweetresp + '\n' + tweet + '-----------' 
+
+	return tweetresp
+
+
+
 
 
 
