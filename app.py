@@ -1,87 +1,48 @@
-import os,sys
-from flask import Flask,request
-from pymessenger import Bot
-from random import randint
-from twurl import extractTweets as et
+"""
+
+This bot listens to port 5002 for incoming connections from Facebook. It takes
+
+in any messages that the bot receives and echos it back.
+
+"""
+
+from flask import Flask, request
+from pymessenger.bot import Bot
 
 app = Flask(__name__)
-PAGE_ACCESS_TOKEN = 'EAAEFka4KZCEMBAPsugFglElkiuw2scGO25Y4FXCUOcCLRuzmvX5sTjLhOOtdTHqpLS0s4N1OfltvMGGZCRsRMdoSUNAa13HGaisZCXwNGzNQ2ID8AlXGPlSFCsHsupMyWHqsf9YrZBrSvlRb4FPyrMh0kNXhpBjaQWeaS8B20gZDZD'
 
-bot = Bot(PAGE_ACCESS_TOKEN)
+ACCESS_TOKEN = "EAAEFka4KZCEMBAPsugFglElkiuw2scGO25Y4FXCUOcCLRuzmvX5sTjLhOOtdTHqpLS0s4N1OfltvMGGZCRsRMdoSUNAa13HGaisZCXwNGzNQ2ID8AlXGPlSFCsHsupMyWHqsf9YrZBrSvlRb4FPyrMh0kNXhpBjaQWeaS8B20gZDZD"
+VERIFY_TOKEN = "hello"
 
-@app.route('/', methods=['GET'])
+bot = Bot(ACCESS_TOKEN)
 
-def verify():
-	#Webhook verification
-	if request.args.get("hub.mode") == "subscribe" and request.args.get("hub.challenge"):
-		if not request.args.get("hub.verify_token")=="hello":
-			return "Verification token mismatch",403
-		return request.args["hub.challenge"],200
-	return "Hello world",200
+@app.route("/", methods=['GET', 'POST'])
 
+def hello():
+    if request.method == 'GET':
+        if request.args.get("hub.verify_token") == VERIFY_TOKEN:
+            return request.args.get("hub.challenge")
+        else:
+            return 'Invalid verification token'
 
-@app.route('/',methods=['POST'])
-def webhook():
-	data = request.get_json()
-	log(data)
-	emoji = [':)', ':P', ';)', ':v', '(y)']					
+    if request.method == 'POST':
+        output = request.get_json()
+        for event in output['entry']:
 
-	if data['object']== 'page':
-		for entry in data['entry']:
-			for messaging_event in entry['messaging']:
-				#ids
-				sender_id = messaging_event['sender']['id']
-				recipient_id = messaging_event['recipient']['id']
-
-				if messaging_event.get('message'):
-					if 'text' in messaging_event['message']:
-						messaging_text=messaging_event['message']['text']
-					else:
-						messaging_text= emoji[random(0,5)]
-
-					
-					response = getResponse(message=messaging_text)
-					bot.send_text_message(sender_id,response)
-
-	return "ok",200
+            messaging = event['messaging']
+            for x in messaging:
+                if x.get('message'):
+                    recipient_id = x['sender']['id']
+                    if x['message'].get('text'):
+                        message = x['message']['text']
+                        bot.send_text_message(recipient_id, message)
+                    if x['message'].get('attachments'):
+                        for att in x['message'].get('attachments'):
+                            bot.send_attachment_url(recipient_id, att['type'], att['payload']['url'])
+                else:
+                    pass
+        return "Success"
 
 
-def log(message):
-	print(message)
-	sys.stdout.flush()
-
-
-def random(start,end):
-	return randint(start,end)
-
-def getResponse(message = 'thoughts'):
-	magicResponse = ['it is certain', 'it is decidedly so','without a doubt','yes definitely','you may rely on it','as I see it, yes','most likely','outlook good',
-'yes',
-'signs point to yes',
-'reply hazy try again',
-'ask again later',
-'better not tell you now',
-'cannot predict now',
-'concentrate and ask again',
-'don\'t count on it',
-'my reply is no',
-'my sources say no',
-'outlook not so good',
-'very doubtful']
-
-	tweets = extractTweets(message)
-	tweetresp = ''
-	for tweet in tweets:
-		tweetresp =	tweetresp + '\n' + tweet + '-----------' 
-
-	return tweetresp
-
-
-
-
-
-
-if __name__=="__main__":
-	app.run(debug = True, port = 80)
-
-
+if __name__ == "__main__":
+    app.run(port=80, debug=True)
