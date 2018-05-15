@@ -22,13 +22,14 @@ def hello():
     if request.method == 'GET':
         if request.args.get("hub.verify_token") == VERIFY_TOKEN:
             return request.args.get("hub.challenge")
+            
         else:
             return 'Invalid verification token'
 
     if request.method == 'POST':
         output = request.get_json()
         for event in output['entry']:
-
+            print('message received!')
             messaging = event['messaging']
             for x in messaging:
                 if x.get('message'):
@@ -41,6 +42,7 @@ def hello():
                             bot.send_attachment_url(recipient_id, att['type'], att['payload']['url'])
                 else:
                     pass
+            print('Outside for')
         return "Success"
 
 
