@@ -41,10 +41,12 @@ def hello():
                         message = x['message']['text']
                         print("Calling getResponse: "+message)
                         resp = getResponse(message)
-                        for r in resp:
-                            bot.send_text_message(recipient_id, r)                          
+                        #print(resp[1])
+                        bot.send_text_message(recipient_id, resp[0])
+                        bot.send_generic_message(recipient_id,resp[1])
                     if x['message'].get('attachments'):
-                        bot.send_text_message(recipient_id, 'I cannot handle attachments')                          
+                        bot.send_text_message(recipient_id, 'I cannot handle attachments!')
+                        bot.send_image_url(recipient_id,'https://media.giphy.com/media/WiRBjwK64r3s4/giphy.gif')                          
                 else:
                     pass
             print('Outside for')
@@ -54,6 +56,7 @@ def getResponse(message):
     try:
         #tweets = ['hi','my name is ',message]
         tweets = extractTweets(message)
+        print(tweets)
         return tweets
         
     except Exception as e:
