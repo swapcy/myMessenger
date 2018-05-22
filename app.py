@@ -40,24 +40,32 @@ def hello():
                     if x['message'].get('text'):
                         message = x['message']['text']
                         print("Calling getResponse: "+message)
-                        resp = getResponse(message)
+                        getResponse(message,recipient_id)
                         #print(resp[1])
-                        bot.send_text_message(recipient_id, resp[0])
-                        bot.send_generic_message(recipient_id,resp[1])
+                        #bot.send_text_message(recipient_id, resp[0])
+                        #payload = resp[1]
+                        #print(payload)
+                        #bot.send_message(recipient_id,resp[1])
                     if x['message'].get('attachments'):
                         bot.send_text_message(recipient_id, 'I cannot handle attachments!')
                         bot.send_image_url(recipient_id,'https://media.giphy.com/media/WiRBjwK64r3s4/giphy.gif')                          
                 else:
+
                     pass
             print('Outside for')
         return "Success"
 
-def getResponse(message):
+def getResponse(message,recepient):
     try:
         #tweets = ['hi','my name is ',message]
+        print('Inside getResponse Function')
         tweets = extractTweets(message)
-        print(tweets)
-        return tweets
+        tweet = tweets[0]
+        listmsg = tweets[1]
+        bot.send_text_message(recepient,tweet)
+        bot.send_message(recepient,listmsg)
+
+        return 'success'
         
     except Exception as e:
         return 'Error Occured'+str(e)
